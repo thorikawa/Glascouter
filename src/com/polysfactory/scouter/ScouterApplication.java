@@ -6,7 +6,9 @@ import android.app.Application;
 
 public class ScouterApplication extends Application {
     static {
-        if (!OpenCVLoader.initDebug()) {
+        if (OpenCVLoader.initDebug()) {
+            System.loadLibrary("scouter");
+        } else {
             // Handle initialization error
         }
     }
