@@ -5,14 +5,8 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity" >
 
-    <SurfaceView
+    <org.opencv.android.JavaCameraView
         android:id="@+id/camera_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center" />
-
-    <com.polysfactory.scouter.FaceView
-        android:id="@+id/overlay_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center" />

@@ -1,105 +1,110 @@
 package com.polysfactory.scouter;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.List;
 
+import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
+import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfRect;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.objdetect.CascadeClassifier;
+
 import android.app.Activity;
-import android.graphics.PixelFormat;
-import android.graphics.Point;
 import android.hardware.Camera;
-import android.hardware.Camera.Face;
-import android.hardware.Camera.FaceDetectionListener;
-import android.hardware.Camera.Parameters;
-import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceHolder.Callback;
-import android.view.SurfaceView;
+import android.view.Menu;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class MainActivity extends Activity implements FaceDetectionListener, Callback {
+public class MainActivity extends Activity implements CvCameraViewListener2 {
 
-    private SurfaceView surfaceView;
-    private FaceView overlayView;
-    private Camera camera;
-
-    // private FrameLayout container;
+    private CameraBridgeViewBase mCameraView;
+    private CascadeClassifier mFaceClassifier;
+    private CascadeClassifier mNoseClassifier;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getWindow().setFormat(PixelFormat.TRANSLUCENT);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
-        // container = (FrameLayout) findViewById(R.id.container);
-
-        surfaceView = (SurfaceView) findViewById(R.id.camera_view);
-        surfaceView.getHolder().addCallback(this);
-
-        overlayView = (FaceView) findViewById(R.id.overlay_view);
-    }
-
-    @Override
-    public void onFaceDetection(Face[] faces, Camera camera) {
-        // Log.d(C.TAG, "onFaceDetection:" + faces.length);
-        for (Face face : faces) {
-            Log.d(C.TAG, face.rect.toShortString());
-            Point mouth = face.mouth;
-            Point leftEye = face.leftEye;
-            Point rightEye = face.rightEye;
-            Log.d(C.TAG, "mouth:" + mouth);
-            Log.d(C.TAG, "leftEye:" + leftEye);
-            Log.d(C.TAG, "rightEye:" + rightEye);
+        mCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
+        mCameraView.setCvCameraViewListener(this);
+        if (Camera.getNumberOfCameras() > 1) {
+            mCameraView.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
+        } else {
+            mCameraView.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_ANY);
         }
-        overlayView.setFaces(faces);
+
+        mCameraView.setMaxFrameSize(400, 240);
+        mCameraView.enableView();
+
+        File faceCascadeFile = IOUtils.getFilePath(this, "cascade", "face.xml");
+        IOUtils.copy(this, R.raw.haarcascade_frontalface_default, faceCascadeFile);
+
+        File noseCascadeFile = IOUtils.getFilePath(this, "cascade", "nose.xml");
+        IOUtils.copy(this, R.raw.haarcascade_mcs_nose, noseCascadeFile);
+
+        mFaceClassifier = new CascadeClassifier();
+        mFaceClassifier.load(faceCascadeFile.getAbsolutePath());
+
+        mNoseClassifier = new CascadeClassifier();
+        mNoseClassifier.load(noseCascadeFile.getAbsolutePath());
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public Mat onCameraFrame(CvCameraViewFrame frame) {
+        Mat rgba = frame.rgba();
+        Mat gray = frame.gray();
+        MatOfRect rects = new MatOfRect();
+        // mCascadeClassifier.detectMultiScale(gray, rects);
+        mFaceClassifier.detectMultiScale(gray, rects, 1.1, 2, 0, new Size(50, 50), new Size(400, 400));
+        List<Rect> faceRectList = rects.toList();
+        for (Rect rect : faceRectList) {
+            Log.d(C.TAG, rect.toString());
+        }
+        if (faceRectList.isEmpty()) {
+            return rgba;
+        }
+
+        Rect rect = faceRectList.get(0);
+        Core.rectangle(rgba, rect.tl(), rect.br(), Scalar.all(200.0));
+        Mat faceMat = rgba.submat(rect);
+        MatOfRect noses = new MatOfRect();
+        mNoseClassifier.detectMultiScale(faceMat, noses, 1.1, 2, 0, new Size(20, 20), new Size(100, 100));
+        List<Rect> noseRectList = noses.toList();
+        if (!noseRectList.isEmpty()) {
+            for (Rect noseRect : noseRectList) {
+                Core.rectangle(faceMat, noseRect.tl(), noseRect.br(), new Scalar(255, 0, 0));
+            }
+        }
+        return rgba;
+    }
+
+    @Override
+    public void onCameraViewStarted(int arg0, int arg1) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        Log.d(C.TAG, "surfaceCreated");
-        camera = Camera.open(0);
-        try {
-            camera.setPreviewDisplay(holder);
-            camera.startPreview();
-            Parameters parameters = camera.getParameters();
-            List<Size> supportedPictureSizes = parameters.getSupportedPictureSizes();
-            for (Size size : supportedPictureSizes) {
-                Log.d(C.TAG, size.width + "," + size.height);
-                if (size.width > 300 && size.width < 640) {
-                    parameters.setPreviewSize(size.width, size.height);
-                    camera.setParameters(parameters);
-                }
+    public void onCameraViewStopped() {
+        // TODO Auto-generated method stub
 
-            }
-            parameters = camera.getParameters();
-            Size size = parameters.getPreviewSize();
-            Log.d(C.TAG, size.width + "," + size.height);
-            // overlayView = new FaceView(this);
-            // LayoutParams lp = new LayoutParams(size.width, size.height, Gravity.CENTER);
-            // container.addView(overlayView, lp);
-        } catch (IOException e) {
-            Log.e(C.TAG, "setPreviewDisplay error", e);
-        }
-        camera.setFaceDetectionListener(this);
-        camera.startFaceDetection();
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        Log.d(C.TAG, "surfaceDestroyed");
-        camera.stopPreview();
-        camera.release();
-        camera = null;
     }
 
 }
