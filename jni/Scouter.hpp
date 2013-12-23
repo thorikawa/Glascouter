@@ -1,5 +1,5 @@
-#ifndef _GUNMAN_H_
-#define _GUNMAN_H_
+#ifndef _SCOUTER_H_
+#define _SCOUTER_H_
 
 #include <opencv2/opencv.hpp>
 

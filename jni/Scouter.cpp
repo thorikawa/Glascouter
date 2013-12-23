@@ -1,4 +1,7 @@
 #include "Scouter.hpp"
+#include "SevenSegment.hpp"
+
+#define TRIANGLE_EDGE 40
 
 Scouter::Scouter(string faceCascadeFile, string noseCascadeFile) {
 	faceClassifier = new CascadeClassifier();
@@ -6,35 +9,83 @@ Scouter::Scouter(string faceCascadeFile, string noseCascadeFile) {
 
 	noseClassifier = new CascadeClassifier();
 	noseClassifier->load(noseCascadeFile);
+
+	cv::Mat red_img(cv::Size(640, 480), CV_8UC3, cv::Scalar(0, 0, 255));
 }
 
 Scouter::~Scouter() {
 }
 
-void Scouter::process(Mat& image) {
+void Scouter::process(Mat& rgba) {
 
-	int w = image.cols;
-	int h = image.rows;
-	// rectangle(image, Point(0.0, 0.0), Point(w, h), Scalar(0.0, 255.0, 0.0, 100.0), CV_FILLED);
+	int w = rgba.cols;
+	int h = rgba.rows;
+	Mat gray;
+	cvtColor(rgba, gray, CV_RGBA2GRAY);
 
+	Mat green(Size(w, h), CV_8UC4, Scalar(0, 255, 0, 255));
+	Mat info(Size(w, h), CV_8UC4, Scalar(255, 255, 255, 0));
+
+	// green overlay
+	addWeighted(rgba, 0.7, green, 0.3, 0.0, rgba);
+
+	// detect faces
 	vector < Rect > faces;
-	faceClassifier->detectMultiScale(image, faces, 1.1, 2, 0, Size(50, 50),
+	faceClassifier->detectMultiScale(gray, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, Size(50, 50),
 			Size(400, 400));
 	if (faces.size() == 0) {
 		return;
 	}
 
-	Rect rect = faces[0];
-	rectangle(image, rect.tl(), rect.br(), Scalar(200, 200, 200));
-	Mat faceMat = image(rect);
-	vector < Rect > noses;
-	noseClassifier->detectMultiScale(faceMat, noses, 1.1, 2, 0, Size(20, 20),
-			Size(100, 100));
-	if (noses.size() > 0) {
-		int n = noses.size();
-		for (int i = 0; i < n; i++) {
-			Rect noseRect = noses[i];
-			rectangle(faceMat, noseRect.tl(), noseRect.br(), Scalar(255, 0, 0));
+	// if find faces...
+	// Rect rect = faces[0];
+	// int minLength = min(rect.width, rect.height);
+	for (int i=0; i<faces.size(); i++) {
+		/*
+		Rect tmpRect = faces[i];
+		int tmpMinLength = min(rect.width, rect.height);
+		if (tmpMinLength > minLength) {
+			rect = tmpRect;
+			minLength = tmpMinLength;
 		}
+		*/
+		Rect rect = faces[i];
+		Point center = Point(rect.x + rect.width / 2, rect.y + rect.height / 2);
+		// int radius = max(rect.width, rect.height);
+		// int radius = (rect.width + rect.height) / 2;
+		int radius = min(rect.width, rect.height) - 10;
+		Point left = Point(center.x - radius - 10, center.y);
+		Point bottom = Point(center.x, center.y + radius + 10);
+
+		circle(rgba, center, radius, Scalar(200, 255, 200), 8);
+
+		// draw triangle on left
+		{
+			Point triangles[3];
+			triangles[0] = left;
+			triangles[1] = Point(left.x - TRIANGLE_EDGE*0.85, left.y - TRIANGLE_EDGE/2);
+			triangles[2] = Point(left.x - TRIANGLE_EDGE*0.85, left.y + TRIANGLE_EDGE/2);
+			const Point* ptriangles[1] = { triangles };
+			int pn[] = { 3 };
+			fillPoly(rgba, ptriangles, pn, 1, Scalar(200, 255, 200), 8);
+		}
+
+		// draw triangle on bottom
+		{
+			Point triangles[3];
+			triangles[0] = bottom;
+			triangles[1] = Point(bottom.x - TRIANGLE_EDGE/2, bottom.y + TRIANGLE_EDGE*0.85);
+			triangles[2] = Point(bottom.x + TRIANGLE_EDGE/2, bottom.y + TRIANGLE_EDGE*0.85);
+			const Point* ptriangles[1] = { triangles };
+			int pn[] = { 3 };
+			fillPoly(rgba, ptriangles, pn, 1, Scalar(200, 255, 200), 8);
+		}
+
+		int powerX = max(5, center.x - radius - SS_EDGE * 2 - 30);
+		int powerY = max(5, center.y - radius - SS_EDGE * 2 - 10);
+		Point powerDispPoint(powerX, powerY);
+		sevensegment::drawString(rgba, "530000", powerDispPoint, Scalar(200, 255, 200));
 	}
+
+	return;
 }
