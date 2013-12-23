@@ -8,8 +8,11 @@ import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 import org.opencv.core.Mat;
 
 import android.app.Activity;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -19,6 +22,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
     private CameraBridgeViewBase mCameraView;
     private ScouterProcessor scouterProcessor;
+    private ScouterSound scouterSound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +45,8 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         IOUtils.copy(this, R.raw.haarcascade_mcs_nose, noseCascadeFile);
 
         scouterProcessor = new ScouterProcessor(faceCascadeFile.getAbsolutePath(), noseCascadeFile.getAbsolutePath());
+
+        scouterSound = new ScouterSound(this);
     }
 
     @Override
@@ -72,4 +78,11 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            scouterSound.processing();
+        }
+        return super.onTouchEvent(event);
+    }
 }
