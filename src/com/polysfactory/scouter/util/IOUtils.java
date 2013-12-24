@@ -1,10 +1,12 @@
-package com.polysfactory.scouter;
+package com.polysfactory.scouter.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import com.polysfactory.scouter.C;
 
 import android.content.Context;
 import android.util.Log;

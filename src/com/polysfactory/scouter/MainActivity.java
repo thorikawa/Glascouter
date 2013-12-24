@@ -21,12 +21,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.polysfactory.scouter.jni.ScouterProcessor;
+import com.polysfactory.scouter.util.IOUtils;
 import com.polysfactory.scouter.view.TriangleView;
 
 public class MainActivity extends Activity implements CvCameraViewListener2 {
@@ -34,7 +34,6 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     private MyCameraView mCameraView;
     private ScouterProcessor mScouterProcessor;
     private ScouterSound mScouterSound;
-    private FrameLayout mContainer;
     private TextView mPowerText;
     private ImageView mSightCircle;
     private TriangleView mLeftTriangle;
@@ -66,7 +65,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         mCameraView = (MyCameraView) findViewById(R.id.camera_view);
         mCameraView.setCvCameraViewListener(this);
         mCameraView.setCameraIndex(C.CAMERA_INDEX);
-        // setting (640, 360) would mess up camera preview... I don't know why. 
+        // setting (640, 360) would mess up camera preview... I don't know why.
         mCameraView.setMaxFrameSize(320, 180);
 
         File faceCascadeFile = IOUtils.getFilePath(this, "cascade", "face.xml");
@@ -79,8 +78,6 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         mScouterSound = new ScouterSound(this);
 
         Typeface font = Typeface.createFromAsset(getAssets(), "font/digital_regular.ttf");
-
-        mContainer = (FrameLayout) findViewById(R.id.container);
         mPowerText = (TextView) findViewById(R.id.text);
         mPowerText.setTypeface(font);
         mPrompt = (TextView) findViewById(R.id.prompt);
