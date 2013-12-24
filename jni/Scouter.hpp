@@ -22,7 +22,7 @@ private:
 public:
 	Scouter(string faceCascadeFile, string noseCascadeFile);
 	~Scouter();
-	void process(Mat &rgba, vector<Rect>& faceRectVec);
+	int process(Mat &rgba, vector<Rect>& faceRectVec);
 };
 
 #endif

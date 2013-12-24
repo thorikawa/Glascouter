@@ -18,9 +18,9 @@ JNIEXPORT jlong JNICALL Java_com_polysfactory_scouter_jni_ScouterProcessor_nativ
 /*
  * Class:     com_polysfactory_scouter_jni_ScouterProcessor
  * Method:    nativeProcess
- * Signature: (JJJ)V
+ * Signature: (JJJ)I
  */
-JNIEXPORT void JNICALL Java_com_polysfactory_scouter_jni_ScouterProcessor_nativeProcess
+JNIEXPORT jint JNICALL Java_com_polysfactory_scouter_jni_ScouterProcessor_nativeProcess
   (JNIEnv *, jobject, jlong, jlong, jlong);
 
 /*

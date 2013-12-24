@@ -16,7 +16,7 @@ Scouter::Scouter(string faceCascadeFile, string noseCascadeFile) {
 Scouter::~Scouter() {
 }
 
-void Scouter::process(Mat& rgba, vector<Rect>& faceRectVec) {
+int Scouter::process(Mat& rgba, vector<Rect>& faceRectVec) {
 
 	int w = rgba.cols;
 	int h = rgba.rows;
@@ -34,7 +34,7 @@ void Scouter::process(Mat& rgba, vector<Rect>& faceRectVec) {
 	faceClassifier->detectMultiScale(gray, faces, 1.1, 2,
 			0 | CV_HAAR_SCALE_IMAGE, Size(50, 50), Size(400, 400));
 	if (faces.size() == 0) {
-		return;
+		return -1;
 	}
 
 	// if find faces...
@@ -64,5 +64,5 @@ void Scouter::process(Mat& rgba, vector<Rect>& faceRectVec) {
 		// LOGD("tl (%d,%d)", rect.tl().x, rect.tl().y);
 	}
 
-	return;
+	return 530000;
 }

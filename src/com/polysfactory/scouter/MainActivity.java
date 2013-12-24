@@ -119,14 +119,14 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         if (mState == State.WILL_START_SCAN) {
             MatOfRect faceRectMat = new MatOfRect();
             // TODO: allow some error attempts
-            mScouterProcessor.process(rgba, faceRectMat);
+            int power = mScouterProcessor.process(rgba, faceRectMat);
 
             List<Rect> faceRectList = faceRectMat.toList();
             if (faceRectList.size() > 0) {
                 Rect faceRect = faceRectList.get(0);
                 mState = State.SCAN_DISPLAYING;
                 captured = rgba.clone();
-                startDisplaying(faceRect);
+                startDisplaying(faceRect, power);
             }
         }
         return rgba;
@@ -191,7 +191,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         return Math.min(1000L, Math.max(1L, (long) (power * 0.001)));
     }
 
-    private void startDisplaying(final Rect rect) {
+    private void startDisplaying(final Rect rect, final int power) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -222,15 +222,14 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         });
 
         // start calculater
-        final long maxPower = 530000L;
-        final long step = calcStep(maxPower);
+        final long step = calcStep(power);
         mScouterSound.processing(true);
         final Runnable r = new Runnable() {
             @Override
             public void run() {
                 mDisplayedPower += step;
-                if (mDisplayedPower > maxPower) {
-                    mDisplayedPower = maxPower;
+                if (mDisplayedPower > power) {
+                    mDisplayedPower = power;
                     mDisplayThreadRunning = false;
                     mScouterSound.beap();
                 }
