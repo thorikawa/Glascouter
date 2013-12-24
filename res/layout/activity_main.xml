@@ -20,8 +20,8 @@
 
     <com.polysfactory.scouter.view.TriangleView
         android:id="@+id/bottom_triangle"
-        android:layout_width="40dp"
-        android:layout_height="34dp"
+        android:layout_width="60px"
+        android:layout_height="51px"
         android:layout_gravity="top|left"
         android:background="#00000000"
         android:visibility="gone"
@@ -30,8 +30,8 @@
 
     <com.polysfactory.scouter.view.TriangleView
         android:id="@+id/left_triangle"
-        android:layout_width="34dp"
-        android:layout_height="40dp"
+        android:layout_width="51px"
+        android:layout_height="60px"
         android:layout_gravity="top|left"
         android:background="#00000000"
         android:visibility="gone"
@@ -52,10 +52,23 @@
         android:id="@+id/text"
         android:layout_width="200dp"
         android:layout_height="80dp"
-        android:layout_gravity="center"
+        android:layout_gravity="top|left"
         android:background="#00000000"
+        android:focusable="false"
         android:text=""
         android:textColor="#FFFF00"
         android:textSize="56sp" />
+
+    <TextView
+        android:id="@+id/prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40px"
+        android:layout_gravity="bottom|center_horizontal"
+        android:background="#00000000"
+        android:focusable="false"
+        android:text="Tap to scan the power!"
+        android:textColor="#FFFF00"
+        android:textSize="24sp" />
 
 </FrameLayout>

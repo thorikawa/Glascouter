@@ -60,8 +60,8 @@ void Scouter::process(Mat& rgba, vector<Rect>& faceRectVec) {
 
 		// circle(rgba, center, radius, Scalar(200, 255, 200), 8);
 		// rectangle(rgba, rect.tl(), rect.br(), Scalar(200, 255, 200), -1, 8);
-		LOGD("rect (%d,%d)", rect.x, rect.y);
-		LOGD("tl (%d,%d)", rect.tl().x, rect.tl().y);
+		// LOGD("rect (%d,%d)", rect.x, rect.y);
+		// LOGD("tl (%d,%d)", rect.tl().x, rect.tl().y);
 	}
 
 	return;

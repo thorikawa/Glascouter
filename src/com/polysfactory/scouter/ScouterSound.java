@@ -10,13 +10,13 @@ public class ScouterSound {
     private int beapSound;
 
     public ScouterSound(Context context) {
-        sp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
-        processingSound = sp.load(context, R.raw.processing, 1);
+        sp = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+        processingSound = sp.load(context, R.raw.processing2, 1);
         beapSound = sp.load(context, R.raw.beap, 1);
     }
 
-    public void processing() {
-        sp.play(processingSound, 1, 1, 0, 0, 1);
+    public void processing(boolean loop) {
+        sp.play(processingSound, 1, 1, 0, loop ? -1 : 0, 1);
     }
 
     public void beap() {
