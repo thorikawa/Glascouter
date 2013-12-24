@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
+import org.opencv.android.MyCameraView;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
@@ -14,6 +15,7 @@ import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
@@ -25,7 +27,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.polysfactory.scouter.jni.ScouterProcessor;
-import com.polysfactory.scouter.view.MyCameraView;
 import com.polysfactory.scouter.view.TriangleView;
 
 public class MainActivity extends Activity implements CvCameraViewListener2 {
@@ -65,9 +66,8 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         mCameraView = (MyCameraView) findViewById(R.id.camera_view);
         mCameraView.setCvCameraViewListener(this);
         mCameraView.setCameraIndex(C.CAMERA_INDEX);
-
-        mCameraView.setMaxFrameSize(400, 240);
-        mCameraView.enableView();
+        // setting (640, 360) would mess up camera preview... I don't know why. 
+        mCameraView.setMaxFrameSize(320, 180);
 
         File faceCascadeFile = IOUtils.getFilePath(this, "cascade", "face.xml");
         IOUtils.copy(this, R.raw.haarcascade_frontalface_default, faceCascadeFile);
@@ -89,6 +89,23 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         mSightCircle = (ImageView) findViewById(R.id.sight_circle_view);
         mLeftTriangle = (TriangleView) findViewById(R.id.left_triangle);
         mBottomTriangle = (TriangleView) findViewById(R.id.bottom_triangle);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onStart();
+        mCameraView.enableView();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onStop();
+        mCameraView.disableView();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
@@ -142,6 +159,21 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         return super.onTouchEvent(event);
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_CAMERA) {
+            // Stop the preview and release the camera.
+            // Execute your logic as quickly as possible
+            // so the capture happens quickly.
+            return false;
+        } else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+            mState = State.WILL_START_SCAN;
+            return false;
+        } else {
+            return super.onKeyDown(keyCode, event);
+        }
+    }
+
     private static void setAbsolutePosition(View v, int x, int y) {
         LayoutParams lp = (LayoutParams) v.getLayoutParams();
         lp.leftMargin = x;
@@ -175,14 +207,16 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
                 int h = (int) (rect.height * mScale);
                 int centerX = x + w / 2;
                 int centerY = y + h / 2;
-                int d = (int) (Math.max(w, h));
-                setAbsolutePositionAndSize(mSightCircle, centerX - d / 2, centerY - d / 2, d, d);
+                int d = (int) (Math.max(w, h) * 1.5);
+                int sightX = centerX - d / 2;
+                int sightY = centerY - d / 2;
+                setAbsolutePositionAndSize(mSightCircle, sightX, sightY, d, d);
 
                 mLeftTriangle.setVisibility(View.VISIBLE);
-                setAbsolutePosition(mLeftTriangle, x - 40, y + d / 2 - 20);
+                setAbsolutePosition(mLeftTriangle, sightX - 51, sightY + d / 2 - 30);
 
                 mBottomTriangle.setVisibility(View.VISIBLE);
-                setAbsolutePosition(mBottomTriangle, x + d / 2 - 20, y + d);
+                setAbsolutePosition(mBottomTriangle, sightX + d / 2 - 30, sightY + d);
 
                 int powerX = centerX > mScreenWidth / 2 ? mCameraViewOffsetX + 40 : mScreenWidth / 2 + 40;
                 int powerY = centerY > mScreenHeight / 2 ? mCameraViewOffsetY + 80 : mScreenHeight / 2 + 80;
