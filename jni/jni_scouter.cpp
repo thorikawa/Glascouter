@@ -3,6 +3,10 @@
 
 using namespace std;
 
+inline void vector_Rect_to_Mat(vector<Rect>& v_rect, Mat& mat) {
+	mat = Mat(v_rect, true);
+}
+
 JNIEXPORT jlong JNICALL Java_com_polysfactory_scouter_jni_ScouterProcessor_nativeCreateObject
   (JNIEnv *jenv, jobject, jstring jFaceXml, jstring jNoseXml) {
 	const char* faceXml = jenv->GetStringUTFChars(jFaceXml, NULL);
@@ -12,9 +16,11 @@ JNIEXPORT jlong JNICALL Java_com_polysfactory_scouter_jni_ScouterProcessor_nativ
 }
 
 JNIEXPORT void JNICALL Java_com_polysfactory_scouter_jni_ScouterProcessor_nativeProcess
-  (JNIEnv *jenv, jobject, jlong thiz, jlong image) {
+  (JNIEnv *jenv, jobject, jlong thiz, jlong image, jlong faceRectMat) {
 	try {
-		((Scouter*) thiz)->process(*((Mat*) image));
+		vector<Rect> faceRectVec;
+		((Scouter*) thiz)->process(*((Mat*) image), faceRectVec);
+		vector_Rect_to_Mat(faceRectVec, *((Mat*)faceRectMat));
 	} catch (...) {
 		jclass je = jenv->FindClass("java/lang/Exception");
 		jenv->ThrowNew(je, "native error");
