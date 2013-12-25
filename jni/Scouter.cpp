@@ -1,8 +1,5 @@
 #include "Scouter.hpp"
-#include "SevenSegment.hpp"
 #include "preprocessFace.h"
-
-#define TRIANGLE_EDGE 40
 
 const char *facerecAlgorithm = "FaceRecognizer.Fisherfaces";
 const bool preprocessLeftAndRightSeparately = true;
