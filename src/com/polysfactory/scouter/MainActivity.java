@@ -258,7 +258,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     }
 
     private static long calcStep(long power) {
-        return Math.min(10000L, Math.max(1L, (long) (power * 0.01)));
+        return Math.min(2000L, Math.max(1L, (long) (power * 0.01)));
     }
 
     private void startDisplaying(final Rect rect, final int power) {
