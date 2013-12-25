@@ -7,8 +7,8 @@ public class ScouterProcessor {
 
     private long mNativeObj;
 
-    public ScouterProcessor(String faceCascadeFile, String noseCascadeFile) {
-        mNativeObj = nativeCreateObject(faceCascadeFile, noseCascadeFile);
+    public ScouterProcessor(String faceCascadeFile, String eyeCascadeFile1, String eyeCascadeFile2, String faceModelFile) {
+        mNativeObj = nativeCreateObject(faceCascadeFile, eyeCascadeFile1, eyeCascadeFile2, faceModelFile);
     }
 
     public int process(Mat imageBgra, MatOfRect faceRect) {
@@ -20,7 +20,8 @@ public class ScouterProcessor {
         mNativeObj = 0;
     }
 
-    private native long nativeCreateObject(String faceCascadeFile, String noseCascadeFile);
+    private native long nativeCreateObject(String faceCascadeFile, String eyeCascadeFile1, String eyeCascadeFiel2,
+            String faceModelFile);
 
     private native int nativeProcess(long thiz, long imageBgra, long faceRect);
 

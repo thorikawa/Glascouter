@@ -8,10 +8,14 @@ inline void vector_Rect_to_Mat(vector<Rect>& v_rect, Mat& mat) {
 }
 
 JNIEXPORT jlong JNICALL Java_com_polysfactory_scouter_jni_ScouterProcessor_nativeCreateObject(
-		JNIEnv *jenv, jobject, jstring jFaceXml, jstring jNoseXml) {
+		JNIEnv *jenv, jobject, jstring jFaceXml, jstring jeyeXml1,
+		jstring jeyeXml2, jstring jFaceModelFile) {
 	const char* faceXml = jenv->GetStringUTFChars(jFaceXml, NULL);
-	const char* noseXml = jenv->GetStringUTFChars(jNoseXml, NULL);
-	Scouter* scouter = new Scouter(string(faceXml), string(noseXml));
+	const char* eyeXml1 = jenv->GetStringUTFChars(jeyeXml1, NULL);
+	const char* eyeXml2 = jenv->GetStringUTFChars(jeyeXml2, NULL);
+	const char* faceModelFile = jenv->GetStringUTFChars(jFaceModelFile, NULL);
+	Scouter* scouter = new Scouter(string(faceXml), string(eyeXml1),
+			string(eyeXml2), string(faceModelFile));
 	return (jlong) scouter;
 }
 

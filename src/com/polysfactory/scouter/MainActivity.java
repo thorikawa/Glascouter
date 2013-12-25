@@ -3,6 +3,7 @@ package com.polysfactory.scouter;
 import java.io.File;
 import java.util.List;
 
+import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 import org.opencv.android.MyCameraView;
@@ -64,17 +65,24 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
         mCameraView = (MyCameraView) findViewById(R.id.camera_view);
         mCameraView.setCvCameraViewListener(this);
-        mCameraView.setCameraIndex(C.CAMERA_INDEX);
+        mCameraView.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_ANY);
         // setting (640, 360) would mess up camera preview... I don't know why.
         mCameraView.setMaxFrameSize(320, 180);
 
         File faceCascadeFile = IOUtils.getFilePath(this, "cascade", "face.xml");
         IOUtils.copy(this, R.raw.haarcascade_frontalface_default, faceCascadeFile);
 
-        File noseCascadeFile = IOUtils.getFilePath(this, "cascade", "nose.xml");
-        IOUtils.copy(this, R.raw.haarcascade_mcs_nose, noseCascadeFile);
+        File eyeCascadeFile1 = IOUtils.getFilePath(this, "cascade", "eye1.xml");
+        IOUtils.copy(this, R.raw.haarcascade_eye, eyeCascadeFile1);
 
-        mScouterProcessor = new ScouterProcessor(faceCascadeFile.getAbsolutePath(), noseCascadeFile.getAbsolutePath());
+        File eyeCascadeFile2 = IOUtils.getFilePath(this, "cascade", "eye2.xml");
+        IOUtils.copy(this, R.raw.haarcascade_eye_tree_eyeglasses, eyeCascadeFile1);
+
+        File faceModelFile = IOUtils.getFilePath(this, "facemodel", "model.data");
+        IOUtils.copy(this, R.raw.model, faceModelFile);
+
+        mScouterProcessor = new ScouterProcessor(faceCascadeFile.getAbsolutePath(), eyeCascadeFile1.getAbsolutePath(),
+                eyeCascadeFile2.getAbsolutePath(), faceModelFile.getAbsolutePath());
         mScouterSound = new ScouterSound(this);
 
         Typeface font = Typeface.createFromAsset(getAssets(), "font/digital_regular.ttf");
@@ -120,6 +128,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
             MatOfRect faceRectMat = new MatOfRect();
             // TODO: allow some error attempts
             int power = mScouterProcessor.process(rgba, faceRectMat);
+            Log.d(C.TAG, "power: " + power);
 
             List<Rect> faceRectList = faceRectMat.toList();
             if (faceRectList.size() > 0) {
@@ -188,7 +197,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     }
 
     private static long calcStep(long power) {
-        return Math.min(1000L, Math.max(1L, (long) (power * 0.001)));
+        return Math.min(10000L, Math.max(1L, (long) (power * 0.01)));
     }
 
     private void startDisplaying(final Rect rect, final int power) {

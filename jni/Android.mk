@@ -8,7 +8,7 @@ OPENCV_LIB_TYPE:=SHARED
 
 include /Users/poly/workspace/OpenCV-2.4.6-android-sdk/sdk/native/jni/OpenCV.mk
 
-LOCAL_SRC_FILES  := Scouter.cpp jni_scouter.cpp
+LOCAL_SRC_FILES  := Scouter.cpp jni_scouter.cpp preprocessFace.cpp detectObject.cpp
 LOCAL_C_INCLUDES += $(LOCAL_PATH)
 LOCAL_LDLIBS     += -llog -ldl
 LOCAL_MODULE     := scouter

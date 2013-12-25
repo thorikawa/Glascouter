@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     com_polysfactory_scouter_jni_ScouterProcessor
  * Method:    nativeCreateObject
- * Signature: (Ljava/lang/String;Ljava/lang/String;)J
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL Java_com_polysfactory_scouter_jni_ScouterProcessor_nativeCreateObject
-  (JNIEnv *, jobject, jstring, jstring);
+  (JNIEnv *, jobject, jstring, jstring, jstring, jstring);
 
 /*
  * Class:     com_polysfactory_scouter_jni_ScouterProcessor

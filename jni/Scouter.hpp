@@ -2,25 +2,23 @@
 #define _SCOUTER_H_
 
 #include <opencv2/opencv.hpp>
-
-#ifdef __ANDROID__
-#include <android/log.h>
-#define LOG_TAG "Scouter/Native"
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__);
-#else
-#define LOGD(...) printf(__VA_ARGS__);
-#endif
-
+#include "common.hpp"
 
 using namespace std;
 using namespace cv;
 
 class Scouter {
 private:
-	CascadeClassifier* faceClassifier;
-	CascadeClassifier* noseClassifier;
+	CascadeClassifier faceCascade;
+	CascadeClassifier noseCascade;
+	CascadeClassifier eyeCascade1;
+	CascadeClassifier eyeCascade2;
+	Ptr<FaceRecognizer> model;
+	Mat eigenvectors;
+	Mat averageFaceRow;
 public:
-	Scouter(string faceCascadeFile, string noseCascadeFile);
+	Scouter(string faceCascadeFile, string eyeCascadeFile1,
+			string eyeCascadeFile2, string faceModelFile);
 	~Scouter();
 	int process(Mat &rgba, vector<Rect>& faceRectVec);
 };
