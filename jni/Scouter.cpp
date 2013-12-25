@@ -55,62 +55,12 @@ Scouter::~Scouter() {
 }
 
 int Scouter::process(Mat& rgba, vector<Rect>& faceRectVec) {
-
-	int w = rgba.cols;
-	int h = rgba.rows;
-	/*
-	Mat gray;
-	cvtColor(rgba, gray, CV_RGBA2GRAY);
-
-	Mat green(Size(w, h), CV_8UC4, Scalar(0, 255, 0, 255));
-	Mat info(Size(w, h), CV_8UC4, Scalar(255, 255, 255, 0));
-	*/
-
-	// green overlay
-	// addWeighted(rgba, 0.7, green, 0.3, 0.0, rgba);
-
-	/*
-	// detect faces
-	vector < Rect > faces;
-	faceCascade.detectMultiScale(gray, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE,
-			Size(50, 50), Size(400, 400));
-	if (faces.size() == 0) {
-		return -1;
-	}
-
-	// if find faces...
-	// Rect rect = faces[0];
-	// int minLength = min(rect.width, rect.height);
-	Rect maxFace;
-	int maxFaceEdge = -1;
-	for (int i = 0; i < faces.size(); i++) {
-		Rect rect = faces[i];
-		faceRectVec.push_back(rect);
-		Point center = Point(rect.x + rect.width / 2, rect.y + rect.height / 2);
-		// int radius = max(rect.width, rect.height);
-		// int radius = (rect.width + rect.height) / 2;
-		int radius = min(rect.width, rect.height) - 10;
-		Point left = Point(center.x - radius - 10, center.y);
-		Point bottom = Point(center.x, center.y + radius + 10);
-
-		int faceEdge = max(rect.width, rect.height);
-		if (maxFaceEdge < faceEdge) {
-			maxFace = rect;
-			maxFaceEdge = faceEdge;
-		}
-		// circle(rgba, center, radius, Scalar(200, 255, 200), 8);
-		// rectangle(rgba, rect.tl(), rect.br(), Scalar(200, 255, 200), -1, 8);
-		// LOGD("rect (%d,%d)", rect.x, rect.y);
-		// LOGD("tl (%d,%d)", rect.tl().x, rect.tl().y);
-	} */
-	// Mat faceMat = rgba(maxFace);
 	Rect faceRect; // Position of detected face.
 	Rect searchedLeftEye, searchedRightEye; // top-left and top-right regions of the face, where eyes were searched.
 	Point leftEye, rightEye; // Position of the detected eyes.
 	Mat test = getPreprocessedFace(rgba, 92, 112, faceCascade, eyeCascade1,
 			eyeCascade2, preprocessLeftAndRightSeparately, &faceRect, &leftEye,
 			&rightEye, &searchedLeftEye, &searchedRightEye);
-	LOGD("preprocessed (%d,%d)", test.cols, test.rows);
 	if (test.cols <= 0 && test.rows <= 0) {
 		return -1;
 	}

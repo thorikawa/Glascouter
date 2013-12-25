@@ -15,7 +15,6 @@
 //////////////////////////////////////////////////////////////////////////////////////
 
 #include "detectObject.h"       // Easily detect faces or eyes (using LBP or Haar Cascades).
-#include "common.hpp"
 
 // Search for objects such as faces in the image using the given parameters, storing the multiple cv::Rects into 'objects'.
 // Can use Haar cascades or LBP cascades for Face Detection, or even eye, mouth, or car detection.
@@ -100,7 +99,6 @@ void detectLargestObject(const Mat &img, CascadeClassifier &cascade, Rect &large
     // Perform Object or Face Detection, looking for just 1 object (the biggest in the image).
     vector<Rect> objects;
     detectObjectsCustom(img, cascade, objects, scaledWidth, flags, minFeatureSize, searchScaleFactor, minNeighbors);
-    LOGD("find %d objects", objects.size());
     if (objects.size() > 0) {
         // Return the only detected object.
         largestObject = (Rect)objects.at(0);

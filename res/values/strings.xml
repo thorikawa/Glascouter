@@ -4,5 +4,7 @@
     <string name="app_name">Scouter</string>
     <string name="action_share">Share</string>
     <string name="hello_world">Hello world!</string>
+    <string name="prompt_tap">Tap to read the power level\nClick menu button to share</string>
+    <string name="prompt_glass">Tap to read the power level</string>
 
 </resources>

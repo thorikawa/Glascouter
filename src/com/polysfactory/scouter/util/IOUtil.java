@@ -14,7 +14,7 @@ import android.view.View;
 
 import com.polysfactory.scouter.C;
 
-public class IOUtils {
+public class IOUtil {
     public static File getFilePath(Context context, String dirname, String filename) {
         File cascadeDir = context.getDir(dirname, Context.MODE_PRIVATE);
         return new File(cascadeDir, filename);
