@@ -111,6 +111,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mScouterProcessor.release();
     }
 
     @Override
@@ -171,6 +172,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
             // Stop the preview and release the camera.
             // Execute your logic as quickly as possible
             // so the capture happens quickly.
+            mCameraView.disableView();
             return false;
         } else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
             mState = State.WILL_START_SCAN;
@@ -234,13 +236,29 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         final long step = calcStep(power);
         mScouterSound.processing(true);
         final Runnable r = new Runnable() {
+            int loopCount = 0;
+
             @Override
             public void run() {
+                loopCount++;
                 mDisplayedPower += step;
                 if (mDisplayedPower > power) {
                     mDisplayedPower = power;
                     mDisplayThreadRunning = false;
+                    mSightCircle.setVisibility(View.VISIBLE);
+                    mLeftTriangle.setVisibility(View.VISIBLE);
+                    mBottomTriangle.setVisibility(View.VISIBLE);
                     mScouterSound.beap();
+                } else {
+                    if ((loopCount / 10) % 2 == 1) {
+                        mSightCircle.setVisibility(View.INVISIBLE);
+                        mLeftTriangle.setVisibility(View.INVISIBLE);
+                        mBottomTriangle.setVisibility(View.INVISIBLE);
+                    } else {
+                        mSightCircle.setVisibility(View.VISIBLE);
+                        mLeftTriangle.setVisibility(View.VISIBLE);
+                        mBottomTriangle.setVisibility(View.VISIBLE);
+                    }
                 }
                 mPowerText.setText("" + mDisplayedPower);
             }
