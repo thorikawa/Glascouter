@@ -5,11 +5,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import com.polysfactory.scouter.C;
+import java.io.OutputStream;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
+import android.view.View;
+
+import com.polysfactory.scouter.C;
 
 public class IOUtils {
     public static File getFilePath(Context context, String dirname, String filename) {
@@ -42,5 +45,29 @@ public class IOUtils {
             }
         }
         return true;
+    }
+
+    public static void takeScreenshot(View view, String filePath) {
+        // create bitmap screen capture
+        Bitmap bitmap;
+        View v1 = view.getRootView();
+        v1.setDrawingCacheEnabled(true);
+        bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+        v1.setDrawingCacheEnabled(false);
+
+        OutputStream fout = null;
+        File imageFile = new File(filePath);
+
+        try {
+            fout = new FileOutputStream(imageFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fout);
+            fout.flush();
+            fout.close();
+
+        } catch (FileNotFoundException e) {
+            Log.e(C.TAG, "screenshot error", e);
+        } catch (IOException e) {
+            Log.e(C.TAG, "screenshot error", e);
+        }
     }
 }

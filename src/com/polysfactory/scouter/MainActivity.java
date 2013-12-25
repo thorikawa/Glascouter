@@ -7,17 +7,24 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 import org.opencv.android.MyCameraView;
+import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -39,7 +46,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     private ImageView mSightCircle;
     private TriangleView mLeftTriangle;
     private TriangleView mBottomTriangle;
-    Mat captured;
+    Mat mCaptured;
     float mScale;
     int mCameraViewOffsetX = 0;
     int mCameraViewOffsetY = 0;
@@ -49,6 +56,11 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     boolean mDisplayThreadRunning = false;
     State mState = State.IDLE;
     private TextView mPrompt;
+    private ImageView mDummyImageView;
+    private int mPreviewWidth;
+    private int mPreviewHeight;
+    private Handler mHandler = new Handler();
+    private Mat mCurrentFrame;
 
     enum State {
         IDLE, WILL_START_SCAN, SCAN_DISPLAYING
@@ -94,6 +106,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         mSightCircle = (ImageView) findViewById(R.id.sight_circle_view);
         mLeftTriangle = (TriangleView) findViewById(R.id.left_triangle);
         mBottomTriangle = (TriangleView) findViewById(R.id.bottom_triangle);
+        mDummyImageView = (ImageView) findViewById(R.id.dummy);
     }
 
     @Override
@@ -122,29 +135,68 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_share) {
+            Log.d(C.TAG, "take screenshot");
+            // File imageFile = IOUtils.getFilePath(this, "tmp", "aaaa.jpg");
+
+            // Hack: Since camera SurfaceView is not captured by View.getDrawingCache(), temporarily enable dummy
+            // ImageView
+            Bitmap bm = Bitmap.createBitmap(mPreviewWidth, mPreviewHeight, Bitmap.Config.ARGB_8888);
+            if (mCaptured != null) {
+                Utils.matToBitmap(mCaptured, bm);
+            } else {
+                Utils.matToBitmap(mCurrentFrame, bm);
+            }
+            mDummyImageView.setImageBitmap(bm);
+            setSize(mDummyImageView, (int) (mPreviewWidth * mScale), (int) (mPreviewHeight * mScale));
+            mDummyImageView.setVisibility(View.VISIBLE);
+
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    String path = Environment.getExternalStorageDirectory().toString() + "/" + "tmp_scouter.jpg";
+                    IOUtils.takeScreenshot(findViewById(R.id.container), path);
+                    mDummyImageView.setVisibility(View.GONE);
+
+                    Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+                    Uri screenshotUri = Uri.fromFile(new File(path));
+
+                    sharingIntent.setType("image/jpeg");
+                    sharingIntent.putExtra(Intent.EXTRA_STREAM, screenshotUri);
+                    startActivity(Intent.createChooser(sharingIntent, "Share scouter screenshot!"));
+                }
+            });
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public Mat onCameraFrame(CvCameraViewFrame frame) {
-        Mat rgba = frame.rgba();
+        mCurrentFrame = frame.rgba().clone();
 
         if (mState == State.WILL_START_SCAN) {
             MatOfRect faceRectMat = new MatOfRect();
             // TODO: allow some error attempts
-            int power = mScouterProcessor.process(rgba, faceRectMat);
+            int power = mScouterProcessor.process(mCurrentFrame, faceRectMat);
             Log.d(C.TAG, "power: " + power);
 
             List<Rect> faceRectList = faceRectMat.toList();
             if (faceRectList.size() > 0) {
                 Rect faceRect = faceRectList.get(0);
                 mState = State.SCAN_DISPLAYING;
-                captured = rgba.clone();
+                mCaptured = mCurrentFrame;
                 startDisplaying(faceRect, power);
             }
         }
-        return rgba;
+        return mCurrentFrame;
     }
 
     @Override
     public void onCameraViewStarted(int w, int h) {
         mScale = mCameraView.getScale();
+        mPreviewWidth = w;
+        mPreviewHeight = h;
         mScreenWidth = mCameraView.getWidth();
         mScreenHeight = mCameraView.getHeight();
         mCameraViewOffsetX = (mScreenWidth - (int) (w * mScale)) / 2;
@@ -193,6 +245,13 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         LayoutParams lp = (LayoutParams) v.getLayoutParams();
         lp.leftMargin = x;
         lp.topMargin = y;
+        lp.width = w;
+        lp.height = h;
+        v.setLayoutParams(lp);
+    }
+
+    private static void setSize(View v, int w, int h) {
+        LayoutParams lp = (LayoutParams) v.getLayoutParams();
         lp.width = w;
         lp.height = h;
         v.setLayoutParams(lp);
