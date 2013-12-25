@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Scouter</string>
+    <string name="app_name">Glascouter</string>
     <string name="action_share">Share</string>
     <string name="hello_world">Hello world!</string>
     <string name="prompt_tap">Tap to read the power level\nClick menu button to share</string>
