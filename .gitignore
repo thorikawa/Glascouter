@@ -36,3 +36,6 @@ proguard/
 
 # Gradle
 .gradle
+
+# KeyStore
+releasekey.keystore
