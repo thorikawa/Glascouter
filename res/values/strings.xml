@@ -5,6 +5,7 @@
     <string name="action_share">Share</string>
     <string name="hello_world">Hello world!</string>
     <string name="prompt_tap">Tap to read the power level\nClick menu button to share</string>
-    <string name="prompt_glass">Tap to read the power level</string>
+    <string name="prompt_glass">Look at the face to read the power level</string>
+    <string name="prompt_glass_again">Tap to read the power level again</string>
 
 </resources>

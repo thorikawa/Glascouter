@@ -116,6 +116,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         if (GlassUtil.isGlass()) {
             mGestureDetector = createGestureDetector(this);
             mPrompt.setText(getString(R.string.prompt_glass));
+            mState = State.WILL_START_SCAN;
         }
     }
 
@@ -348,8 +349,8 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
                 } else if (gesture == Gesture.TWO_TAP) {
                     Log.d(C.TAG, "Two Tap");
                     // XXX: Glass does not support share Intent
-                    share();
-                    return true;
+                    // share();
+                    // return true;
                 }
                 return false;
             }
