@@ -9,6 +9,13 @@ This app change your Google Glass into a real scouter! You can read the power le
 ## Download APK
 https://github.com/thorikawa/Glascouter/releases/download/v1.0/Scouter-debug.apk
 
+If you don't know how to sideload it on your glass, please see [this site](http://appliedanalog.com/agw/?p=17).
+
+## How to use
+1. Say "Start a scouter" on the home screen.
+2. Look at the face of the target.
+3. You can read the power!
+
 ## Build from source
 OpenCV Android SDK is required to build this app from source. Please follow [this instruction](http://docs.opencv.org/doc/tutorials/introduction/android_binary_package/O4A_SDK.html) to install it.
 
