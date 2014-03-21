@@ -1,7 +1,7 @@
 Glascouter
 ==========
 ### Turn your Google Glass into  Dragonball Z Scouter!
-Have you ever seen Japanese animation [Dragonball](https://www.google.com/search?q=dragonball&source=lnms&tbm=isch)? And do you know the [scouter](https://www.google.com/search?q=scouter+dragonball&source=lnms&tbm=isch)? For those who are not familar with it, scouter is, perhaps, the most popular gadget in the Japanese animation. DBZ's scouter's claim to fame is reading the power levels of the show's characters (and exploding into a million bits when the levels are just too damn high).
+Have you ever seen Japanese animation [Dragonball](https://www.google.com/search?q=dragonball&source=lnms&tbm=isch)? And do you know the [scouter](https://www.google.com/search?q=scouter+dragonball&source=lnms&tbm=isch)? For those who are not familar with it, scouter is, perhaps, the most popular gadget in all Japanese animations. DBZ's scouter's claim to fame is reading the power levels of the show's characters (and exploding into a million bits when the levels are just too damn high).
 
 This app change your Google Glass into a real scouter! You can read the power level, as long as his/her power does not exceed the limit of scouter...
 <img src="http://thorikawa.github.io/Glascouter/img/glass_screenshot.png" />
