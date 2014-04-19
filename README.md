@@ -7,7 +7,7 @@ This app change your Google Glass into a real scouter! You can read the power le
 <img src="http://thorikawa.github.io/Glascouter/img/glass_screenshot.png" />
 
 ## Download APK
-Download the latest [apk](https://github.com/thorikawa/Glascouter/releases/download/v1.1/Scouter-release-1.1.apk).
+Download the latest [apk](https://github.com/thorikawa/Glascouter/releases/download/v1.2/Scouter-release-1.2.apk).
 
 If you don't know how to sideload it on your glass, please see [this site](http://appliedanalog.com/agw/?p=17).
 
